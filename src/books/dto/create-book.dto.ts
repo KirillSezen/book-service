@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -42,10 +43,10 @@ export class CreateBookDto {
   @ApiProperty({
     description: 'The genre of the book',
     example: 'horror',
-    minLength: 5,
+    minLength: 3,
     maxLength: 300,
   })
-  @MinLength(5)
+  @MinLength(3)
   @MaxLength(300)
   @IsString({ message: 'Must be a string' })
   genre: string;
@@ -58,8 +59,7 @@ export class CreateBookDto {
   })
   @MinLength(5)
   @MaxLength(300)
+  @IsOptional()
   @IsString({ message: 'Must be a string' })
   description?: string;
-
-  orderId: number;
 }

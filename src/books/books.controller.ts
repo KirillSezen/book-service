@@ -18,8 +18,8 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { BookEntity } from './entities/book.entity';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { BookEntity } from './dto/book.entity';
+import { JwtAuthGuard } from 'infrastructure/dist/guards/jwt-auth.guard';
 import { FilterDto } from './dto/filter.dto';
 
 @Controller('books')

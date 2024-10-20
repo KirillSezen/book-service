@@ -32,30 +32,4 @@ export class FilterService {
 
     return posts;
   }
-
-  async filterUsers(filterDto: FilterDto) {
-    const { page, limit, search, sort, order } = filterDto;
-    const offset = (page - 1) * limit || 0;
-
-    const whereConditions = {};
-    if (search) {
-      whereConditions['OR'] = [
-        { email: { contains: search, mode: 'insensitive' } },
-      ];
-    }
-
-    const orderByConditions = {};
-    if (sort && order) {
-      orderByConditions[sort] = order;
-    }
-
-    const users = await this.prisma.user.findMany({
-      where: whereConditions,
-      orderBy: orderByConditions,
-      skip: offset,
-      take: limit,
-    });
-
-    return users;
-  }
 }

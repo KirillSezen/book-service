@@ -6,14 +6,38 @@ import { FilterDto } from './dto/filter.dto';
 import { FilterService } from './filter.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { InjectQueue } from '@nestjs/bull';
+import { Job } from 'bull';
+import { Process, Processor } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
+@Processor('order-queue')
 export class BooksService {
   constructor(
     private prisma: PrismaService,
     private filterService: FilterService,
+    @InjectQueue('order-queue') private orderQueue: Queue,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+
+  @Process('checkBooks')
+  async processTakingBooks(job: Job<{ books: string[] }>) {
+    const { books } = job.data;
+    const titles = await this.prisma.book.findMany({
+      where: {
+        name: {
+          in: books,
+        },
+      },
+    });
+    const foundTitles = new Set(titles.map((book) => book.name));
+    const missingTitles = books.filter((name) => !foundTitles.has(name));
+
+    const totalPrice = titles.reduce((sum, book) => sum + book.price, 0);
+    return { missingTitles, totalPrice };
+  }
+
   async create(createBookDto: CreateBookDto) {
     const result = await this.prisma.book.create({
       data: { ...createBookDto },
@@ -23,16 +47,13 @@ export class BooksService {
 
   async findAll(filterDto: FilterDto) {
     const cacheKey = `books:${JSON.stringify(filterDto)}`;
-
     const cachedBooks = await this.cacheManager.get(cacheKey);
     if (cachedBooks) {
       return cachedBooks;
     }
 
     const books = await this.filterService.filterBooks(filterDto);
-
     await this.cacheManager.set(cacheKey, books, 180);
-
     return books;
   }
 

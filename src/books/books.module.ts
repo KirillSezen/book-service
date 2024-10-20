@@ -3,29 +3,22 @@ import { BooksService } from './books.service';
 import { BooksController } from './books.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { FilterService } from './filter.service';
-import { CacheModule } from '@nestjs/cache-manager';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from 'infrastructure/dist/strategeis/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
-import { redisStore } from 'cache-manager-redis-store';
+import { CommonConfigModule } from 'infrastructure/dist/configs/configuration';
+import { CommonCacheConfigModule } from 'infrastructure/dist/configs/cache-config';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   controllers: [BooksController],
   providers: [BooksService, FilterService, JwtStrategy],
   imports: [
     PrismaModule,
-    CacheModule.register({
-      store: redisStore,
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT,
-      ttl: Number(process.env.REDIS_TTL),
-    }),
     PassportModule,
-    JwtModule.register({
-      secret: process.env.PRIVATE_KEY || 'SECRET',
-      signOptions: {
-        expiresIn: '2h',
-      },
+    CommonConfigModule,
+    CommonCacheConfigModule,
+    BullModule.registerQueue({
+      name: 'order-queue',
     }),
   ],
 })
