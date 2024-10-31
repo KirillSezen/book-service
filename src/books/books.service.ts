@@ -6,10 +6,8 @@ import { FilterDto } from './dto/filter.dto';
 import { FilterService } from './filter.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { InjectQueue } from '@nestjs/bull';
 import { Job } from 'bull';
 import { Process, Processor } from '@nestjs/bull';
-import { Queue } from 'bull';
 
 @Injectable()
 @Processor('order-queue')
@@ -17,7 +15,6 @@ export class BooksService {
   constructor(
     private prisma: PrismaService,
     private filterService: FilterService,
-    @InjectQueue('order-queue') private orderQueue: Queue,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -35,7 +32,7 @@ export class BooksService {
     const missingTitles = books.filter((name) => !foundTitles.has(name));
 
     const totalPrice = titles.reduce((sum, book) => sum + book.price, 0);
-    return { missingTitles, totalPrice };
+    return { missingTitles, totalPrice, titles };
   }
 
   async create(createBookDto: CreateBookDto) {

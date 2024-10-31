@@ -36,7 +36,8 @@
     "cache-manager-redis-store": "^2.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "infrastructure": "^1.0.4",
+    "infrastructure": "^1.1.1",
+    "mypackage": "^1.2.4",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"

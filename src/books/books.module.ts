@@ -3,11 +3,11 @@ import { BooksService } from './books.service';
 import { BooksController } from './books.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { FilterService } from './filter.service';
-import { JwtStrategy } from 'infrastructure/dist/strategeis/jwt.strategy';
+import { JwtStrategy } from 'mypackage/dist/strategeis/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { CommonConfigModule } from 'infrastructure/dist/configs/configuration';
-import { CommonCacheConfigModule } from 'infrastructure/dist/configs/cache-config';
-import { BullModule } from '@nestjs/bull';
+import { CommonConfigModule } from 'mypackage/dist/configs/configuration.module';
+import { CommonCacheConfigModule } from 'mypackage/dist/configs/cache-config.module';
+import { QueueModule } from 'mypackage/dist/queues/queue/queue.module';
 
 @Module({
   controllers: [BooksController],
@@ -17,9 +17,7 @@ import { BullModule } from '@nestjs/bull';
     PassportModule,
     CommonConfigModule,
     CommonCacheConfigModule,
-    BullModule.registerQueue({
-      name: 'order-queue',
-    }),
+    QueueModule,
   ],
 })
 export class BooksModule {}
